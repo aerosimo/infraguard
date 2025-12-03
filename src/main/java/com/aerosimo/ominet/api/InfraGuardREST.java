@@ -53,9 +53,9 @@ public class InfraGuardREST {
     @Path("/pulse")
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkPulse() {
-        boolean jenkinsAlive = PulsePoint.isAlive("https://ominet.aerosimo.com:8443");
+        boolean jenkinsAlive = PulsePoint.isAlive("ominet.aerosimo.com:8443");
         boolean tomeeAlive   = PulsePoint.isAlive("https://ominet.aerosimo.com:9443");
-        boolean linuxAlive   = PulsePoint.isAlive("https://ominet.aerosimo.com:9090");
+        boolean linuxAlive   = PulsePoint.isAlive("ominet.aerosimo.com:9090");
         boolean oracleAlive  = true;
         return Response.ok(
                 new PingServerResponseDTO(jenkinsAlive, oracleAlive, linuxAlive, tomeeAlive)
