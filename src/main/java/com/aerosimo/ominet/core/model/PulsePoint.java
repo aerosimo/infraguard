@@ -31,6 +31,9 @@
 
 package com.aerosimo.ominet.core.model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.*;
@@ -41,6 +44,7 @@ import java.util.ArrayList;
 
 public class PulsePoint {
 
+    private static final Logger log = LogManager.getLogger(PulsePoint.class.getName());
     private static final Instant START_TIME = Instant.now();
 
     public static boolean isAlive(String target) {
@@ -64,7 +68,13 @@ public class PulsePoint {
             conn.setRequestMethod("GET");
             int code = conn.getResponseCode();
             return (code >= 200 && code < 400);
-        } catch (IOException e) {
+        } catch (IOException err) {
+            log.error("System http check failed with the following: - {}", String.valueOf(err));
+            try {
+                Spectre.recordError("TE-20001", "System http check failed with the following " + err, PulsePoint.class.getName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             return false;
         }
     }
@@ -73,7 +83,13 @@ public class PulsePoint {
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(host, port), 2000);
             return true;
-        } catch (IOException e) {
+        } catch (IOException err) {
+            log.error("System tcp check failed with the following: - {}", String.valueOf(err));
+            try {
+                Spectre.recordError("TE-20001", "System tcp check failed with the following " + err, PulsePoint.class.getName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             return false;
         }
     }
