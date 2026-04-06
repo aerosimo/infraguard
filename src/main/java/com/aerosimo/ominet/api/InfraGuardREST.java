@@ -32,13 +32,17 @@
 package com.aerosimo.ominet.api;
 
 import com.aerosimo.ominet.core.model.PulsePoint;
+import com.aerosimo.ominet.core.model.Spectre;
 import com.aerosimo.ominet.dao.impl.*;
+import com.aerosimo.ominet.dao.mapper.MetricsDAO;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,5 +92,34 @@ public class InfraGuardREST {
             cpuDTOs.add(new CpuThreadDTO(cpuRaw.get(i), cpuRaw.get(i+1), cpuRaw.get(i+2)));}
         MetricResponseDTO metrics = new MetricResponseDTO(diskDTO, memoryDTO, cpuDTOs);
         return Response.ok(metrics).build();
+    }
+
+    @GET
+    @Path("/capture")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response triggerCapture() {
+        try {
+            PulsePoint.captureAndSaveMetrics();
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            APIResponseDTO responseDTO = new APIResponseDTO(
+                    "success",
+                    "System metrics captured and persisted successfully at " + timestamp
+            );
+            return Response.ok(responseDTO).build();
+        } catch (Exception err) {
+            log.error("Error in InfraGuardREST (CAPTURE)", err);
+            try {
+                Spectre.recordError("TE-20001", "Error in InfraGuardREST (CAPTURE): " + err.getMessage(), MetricsDAO.class.getName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            APIResponseDTO errorDTO = new APIResponseDTO(
+                    "error",
+                    "Capture failed: " + err.getMessage()
+            );
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(errorDTO)
+                    .build();
+        }
     }
 }

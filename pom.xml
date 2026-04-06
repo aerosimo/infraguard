@@ -83,10 +83,11 @@
         <maven.clean.version>3.5.0</maven.clean.version>
         <maven.jar.version>3.4.2</maven.jar.version>
         <maven.war.version>3.4.0</maven.war.version>
+        <jdbc.version>23.9.0.25.07</jdbc.version>
         <jakarta.version>10.0.0</jakarta.version>
         <servlet.version>6.1.0</servlet.version>
-        <jersey.version>3.1.11</jersey.version>
-        <log4j.version>2.25.1</log4j.version>
+        <jersey.version>4.0.2</jersey.version>
+        <log4j.version>2.25.4</log4j.version>
         <jstl.version>3.0.1</jstl.version>
         <xml.version>4.0.3</xml.version>
         <jws.version>3.0.0</jws.version>
@@ -97,6 +98,12 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>${servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc11</artifactId>
+            <version>${jdbc.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

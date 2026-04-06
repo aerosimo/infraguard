@@ -31,6 +31,7 @@
 
 package com.aerosimo.ominet.core.model;
 
+import com.aerosimo.ominet.dao.mapper.MetricsDAO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,12 +41,13 @@ import java.lang.management.*;
 import java.net.*;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.*;
 
 public class PulsePoint {
 
     private static final Logger log = LogManager.getLogger(PulsePoint.class.getName());
     private static final Instant START_TIME = Instant.now();
+    private static final MetricsDAO dao = new MetricsDAO();
 
     public static boolean isAlive(String target) {
         if (target.startsWith("http://") || target.startsWith("https://")) {
@@ -130,36 +132,77 @@ public class PulsePoint {
     }
 
     public static String[] getDisk() {
-        String[] diskusage = new String[3];
-        File root = new File("/");
-        diskusage[0] = String.format("%.2fGB", (double) root.getTotalSpace() / 1073741824);
-        diskusage[1] = String.format("%.2fGB", (double) root.getFreeSpace() / 1073741824);
-        diskusage[2] = String.format("%.2fGB", (double) root.getUsableSpace() / 1073741824);
-        return diskusage;
+        // We ask the DAO for the most recent record (1 hour back)
+        Map<String, Object> data = dao.getLatestDiskMetric();
+
+        if (data.isEmpty()) return new String[] {"0.00GB", "0.00GB", "0.00GB"};
+
+        return new String[] {
+                String.format("%.2fGB", (Double) data.get("total")),
+                String.format("%.2fGB", (Double) data.get("free")),
+                String.format("%.2fGB", (Double) data.get("usable"))
+        };
     }
 
     public static String[] getMemory() {
-        String[] memoryusage = new String[4];
-        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
-        memoryusage[0] = String.format("%.2fGB", (double) memoryMXBean.getHeapMemoryUsage().getInit() / 1073741824);
-        memoryusage[1] = String.format("%.2fGB", (double) memoryMXBean.getHeapMemoryUsage().getUsed() / 1073741824);
-        memoryusage[2] = String.format("%.2fGB", (double) memoryMXBean.getHeapMemoryUsage().getMax() / 1073741824);
-        memoryusage[3] = String.format("%.2fGB", (double) memoryMXBean.getHeapMemoryUsage().getCommitted() / 1073741824);
-        return memoryusage;
+        Map<String, Object> data = dao.getLatestMemoryMetric();
+
+        if (data.isEmpty()) return new String[] {"0.00GB", "0.00GB", "0.00GB", "0.00GB"};
+
+        return new String[] {
+                String.format("%.2fGB", (Double) data.get("init")),
+                String.format("%.2fGB", (Double) data.get("used")),
+                String.format("%.2fGB", (Double) data.get("max")),
+                String.format("%.2fGB", (Double) data.get("committed"))
+        };
     }
 
     public static ArrayList<String> getCpu() {
-        ArrayList<String> cpuusage = new ArrayList<>();
+        ArrayList<String> cpuList = new ArrayList<>();
+        List<Map<String, Object>> threads = Collections.singletonList(dao.getLatestCpuMetrics());
+
+        for (Map<String, Object> thread : threads) {
+            cpuList.add((String) thread.get("threadName"));
+            cpuList.add((String) thread.get("state"));
+            cpuList.add(String.valueOf(thread.get("cpuTime")));
+        }
+        return cpuList;
+    }
+
+    public static void captureAndSaveMetrics() {
+        String audit = "SYSTEM_PULSE";
+
+        // Capture and Save Disk
+        File root = new File("/");
+        Map<String, String> diskMap = new HashMap<>();
+        diskMap.put("total", String.valueOf((double) root.getTotalSpace() / 1073741824));
+        diskMap.put("free", String.valueOf((double) root.getFreeSpace() / 1073741824));
+        diskMap.put("usable", String.valueOf((double) root.getUsableSpace() / 1073741824));
+        dao.saveDiskMetrics(diskMap, audit);
+
+        // Capture and Save Memory
+        MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
+        MemoryUsage heap = memBean.getHeapMemoryUsage();
+        Map<String, String> memMap = new HashMap<>();
+        memMap.put("init", String.valueOf((double) heap.getInit() / 1073741824));
+        memMap.put("used", String.valueOf((double) heap.getUsed() / 1073741824));
+        memMap.put("max", String.valueOf((double) heap.getMax() / 1073741824));
+        memMap.put("committed", String.valueOf((double) heap.getCommitted() / 1073741824));
+        dao.saveMemoryMetrics(memMap, audit);
+
+        // Capture and Save CPU
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-        cpuusage.clear(); // reset list to avoid duplicates
-        for (Long threadID : threadMXBean.getAllThreadIds()) {
-            ThreadInfo info = threadMXBean.getThreadInfo(threadID);
-            if (info != null) { // avoid null ThreadInfo
-                cpuusage.add(info.getThreadName());
-                cpuusage.add(String.valueOf(info.getThreadState()));
-                cpuusage.add(String.format("%s", threadMXBean.getThreadCpuTime(threadID)));
+        List<Map<String, Object>> cpuThreads = new ArrayList<>();
+        for (long id : threadMXBean.getAllThreadIds()) {
+            ThreadInfo info = threadMXBean.getThreadInfo(id);
+            if (info != null) {
+                Map<String, Object> t = new HashMap<>();
+                t.put("threadName", info.getThreadName());
+                t.put("state", info.getThreadState().toString());
+                t.put("cpuTime", threadMXBean.getThreadCpuTime(id));
+                cpuThreads.add(t);
             }
         }
-        return cpuusage;
+        dao.saveCpuMetrics(cpuThreads, audit);
     }
 }
