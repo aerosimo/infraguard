@@ -47,7 +47,6 @@ public class PulsePoint {
 
     private static final Logger log = LogManager.getLogger(PulsePoint.class.getName());
     private static final Instant START_TIME = Instant.now();
-    private static final MetricsDAO dao = new MetricsDAO();
 
     public static boolean isAlive(String target) {
         if (target.startsWith("http://") || target.startsWith("https://")) {
@@ -133,7 +132,7 @@ public class PulsePoint {
 
     public static String[] getDisk() {
         // We ask the DAO for the most recent record (1 hour back)
-        Map<String, Object> data = dao.getLatestDiskMetric();
+        Map<String, Object> data = MetricsDAO.getLatestDiskMetric();
 
         if (data.isEmpty()) return new String[] {"0.00GB", "0.00GB", "0.00GB"};
 
@@ -145,7 +144,7 @@ public class PulsePoint {
     }
 
     public static String[] getMemory() {
-        Map<String, Object> data = dao.getLatestMemoryMetric();
+        Map<String, Object> data = MetricsDAO.getLatestMemoryMetric();
 
         if (data.isEmpty()) return new String[] {"0.00GB", "0.00GB", "0.00GB", "0.00GB"};
 
@@ -159,7 +158,7 @@ public class PulsePoint {
 
     public static ArrayList<String> getCpu() {
         ArrayList<String> cpuList = new ArrayList<>();
-        List<Map<String, Object>> threads = Collections.singletonList(dao.getLatestCpuMetrics());
+        List<Map<String, Object>> threads = Collections.singletonList(MetricsDAO.getLatestCpuMetrics());
 
         for (Map<String, Object> thread : threads) {
             cpuList.add((String) thread.get("threadName"));
@@ -178,7 +177,7 @@ public class PulsePoint {
         diskMap.put("total", String.valueOf((double) root.getTotalSpace() / 1073741824));
         diskMap.put("free", String.valueOf((double) root.getFreeSpace() / 1073741824));
         diskMap.put("usable", String.valueOf((double) root.getUsableSpace() / 1073741824));
-        dao.saveDiskMetrics(diskMap, audit);
+        MetricsDAO.saveDiskMetrics(diskMap, audit);
 
         // Capture and Save Memory
         MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
@@ -188,7 +187,7 @@ public class PulsePoint {
         memMap.put("used", String.valueOf((double) heap.getUsed() / 1073741824));
         memMap.put("max", String.valueOf((double) heap.getMax() / 1073741824));
         memMap.put("committed", String.valueOf((double) heap.getCommitted() / 1073741824));
-        dao.saveMemoryMetrics(memMap, audit);
+        MetricsDAO.saveMemoryMetrics(memMap, audit);
 
         // Capture and Save CPU
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
@@ -203,6 +202,6 @@ public class PulsePoint {
                 cpuThreads.add(t);
             }
         }
-        dao.saveCpuMetrics(cpuThreads, audit);
+        MetricsDAO.saveCpuMetrics(cpuThreads, audit);
     }
 }

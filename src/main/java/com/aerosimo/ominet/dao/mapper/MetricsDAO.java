@@ -33,7 +33,6 @@ package com.aerosimo.ominet.dao.mapper;
 
 import com.aerosimo.ominet.core.config.Connect;
 import com.aerosimo.ominet.core.model.Spectre;
-import com.aerosimo.ominet.dao.impl.APIResponseDTO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,7 +51,7 @@ public class MetricsDAO {
      * Helper to strip "GB" and convert string to Double
      * e.g., "299.85GB" -> 299.85
      */
-    private Double parseGB(String value) {
+    private static Double parseGB(String value) {
         if (value == null) return 0.0;
         try {
             return Double.parseDouble(value.replaceAll("[^0-9.]", ""));
@@ -64,17 +63,15 @@ public class MetricsDAO {
     /**
      * Saves Disk Metrics to Oracle via PL/SQL Package
      */
-    public void saveDiskMetrics(Map<String, String> diskData, String modifiedBy) {
+    public static void saveDiskMetrics(Map<String, String> diskData, String modifiedBy) {
         String sql = "{call infraguard_pkg.log_disk_usage(?, ?, ?, ?)}";
 
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
-
             stmt.setDouble(1, parseGB(diskData.get("total")));
             stmt.setDouble(2, parseGB(diskData.get("free")));
             stmt.setDouble(3, parseGB(diskData.get("usable")));
             stmt.setString(4, modifiedBy);
-
             stmt.execute();
         } catch (SQLException err) {
             log.error("Error in infraguard_pkg (LOG DISK USAGE)", err);
@@ -89,18 +86,16 @@ public class MetricsDAO {
     /**
      * Saves Memory Metrics to Oracle via PL/SQL Package
      */
-    public void saveMemoryMetrics(Map<String, String> memData, String modifiedBy) {
+    public static void saveMemoryMetrics(Map<String, String> memData, String modifiedBy) {
         String sql = "{call infraguard_pkg.log_memory_usage(?, ?, ?, ?, ?)}";
 
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
-
             stmt.setDouble(1, parseGB(memData.get("init")));
             stmt.setDouble(2, parseGB(memData.get("used")));
             stmt.setDouble(3, parseGB(memData.get("max")));
             stmt.setDouble(4, parseGB(memData.get("committed")));
             stmt.setString(5, modifiedBy);
-
             stmt.execute();
         } catch (SQLException err) {
             log.error("Error in infraguard_pkg (LOG MEMORY USAGE)", err);
@@ -115,23 +110,19 @@ public class MetricsDAO {
     /**
      * Saves CPU Threads (Batch insert loop)
      */
-    public void saveCpuMetrics(List<Map<String, Object>> cpuThreads, String modifiedBy) {
+    public static void saveCpuMetrics(List<Map<String, Object>> cpuThreads, String modifiedBy) {
         String sql = "{call infraguard_pkg.log_cpu_usage(?, ?, ?, ?)}";
 
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
-
             for (Map<String, Object> thread : cpuThreads) {
                 stmt.setString(1, (String) thread.get("threadName"));
                 stmt.setString(2, (String) thread.get("state"));
-                // cpuTime is usually a long, so we use setLong or setDouble
                 stmt.setObject(3, thread.get("cpuTime"));
                 stmt.setString(4, modifiedBy);
-
                 stmt.addBatch();
             }
             stmt.executeBatch();
-
         } catch (SQLException err) {
             log.error("Error in infraguard_pkg (LOG MEMORY USAGE)", err);
             try {
@@ -142,63 +133,91 @@ public class MetricsDAO {
         }
     }
 
-    public Map<String, Object> getLatestDiskMetric() {
+    public static Map<String, Object> getLatestDiskMetric() {
         Map<String, Object> result = new HashMap<>();
         String sql = "{call infraguard_pkg.get_metrics_history('DISK', 1, ?)}";
-
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
             stmt.registerOutParameter(1, java.sql.Types.REF_CURSOR);
             stmt.execute();
-
             try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(1)) {
                 if (rs.next()) {
+                    result.put("diskid", rs.getDouble("diskid"));
                     result.put("total", rs.getDouble("total"));
                     result.put("free", rs.getDouble("free"));
                     result.put("usable", rs.getDouble("usable"));
+                    result.put("modifiedBy", rs.getDouble("modifiedBy"));
+                    result.put("modifiedDate", rs.getDouble("modifiedDate"));
+                    log.info("Fetched total of {} bytes from disk", result.get("total"));
+                    log.info("Fetched free of {} bytes from disk", result.get("free"));
+                    log.info("Fetched usable of {} bytes from disk", result.get("usable"));
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception err) {
+            log.error("Error in infraguard_pkg (GET DISK METRIC)", err);
+            try {
+                Spectre.recordError("TE-20001", "Error in infraguard_pkg (GET DISK METRIC): " + err.getMessage(), MetricsDAO.class.getName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         return result;
     }
 
-    public Map<String, Object> getLatestMemoryMetric() {
+    public static Map<String, Object> getLatestMemoryMetric() {
         Map<String, Object> result = new HashMap<>();
         String sql = "{call infraguard_pkg.get_metrics_history('MEMORY', 1, ?)}";
-
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
             stmt.registerOutParameter(1, java.sql.Types.REF_CURSOR);
             stmt.execute();
-
             try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(1)) {
                 if (rs.next()) {
-                    result.put("total", rs.getDouble("total"));
-                    result.put("free", rs.getDouble("free"));
-                    result.put("usable", rs.getDouble("usable"));
+                    result.put("memoryid", rs.getDouble("memoryid"));
+                    result.put("init", rs.getDouble("init"));
+                    result.put("used", rs.getDouble("used"));
+                    result.put("max", rs.getDouble("max"));
+                    result.put("committed", rs.getDouble("committed"));
+                    result.put("modifiedBy", rs.getDouble("modifiedBy"));
+                    result.put("modifiedDate", rs.getDouble("modifiedDate"));
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception err) {
+            log.error("Error in infraguard_pkg (GET MEMORY METRIC)", err);
+            try {
+                Spectre.recordError("TE-20001", "Error in infraguard_pkg (GET MEMORY METRIC): " + err.getMessage(), MetricsDAO.class.getName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         return result;
     }
 
-    public Map<String, Object> getLatestCpuMetrics() {
+    public static Map<String, Object> getLatestCpuMetrics() {
         Map<String, Object> result = new HashMap<>();
         String sql = "{call infraguard_pkg.get_metrics_history('CPU', 1, ?)}";
-
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
             stmt.registerOutParameter(1, java.sql.Types.REF_CURSOR);
             stmt.execute();
-
             try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(1)) {
                 if (rs.next()) {
-                    result.put("total", rs.getDouble("total"));
-                    result.put("free", rs.getDouble("free"));
-                    result.put("usable", rs.getDouble("usable"));
+                    result.put("cpuid", rs.getDouble("cpuid"));
+                    result.put("threadName", rs.getDouble("threadName"));
+                    result.put("state", rs.getDouble("state"));
+                    result.put("cpuTime", rs.getDouble("cpuTime"));
+                    result.put("modifiedBy", rs.getDouble("modifiedBy"));
+                    result.put("modifiedDate", rs.getDouble("modifiedDate"));
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception err) {
+            log.error("Error in infraguard_pkg (GET CPU METRIC)", err);
+            try {
+                Spectre.recordError("TE-20001", "Error in infraguard_pkg (GET CPU METRIC): " + err.getMessage(), MetricsDAO.class.getName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         return result;
     }
 }
