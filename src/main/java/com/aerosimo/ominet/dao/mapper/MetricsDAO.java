@@ -135,12 +135,13 @@ public class MetricsDAO {
 
     public static Map<String, Object> getLatestDiskMetric() {
         Map<String, Object> result = new HashMap<>();
-        String sql = "{call infraguard_pkg.getDiskMetrics(12, ?)}";
+        String sql = "{call infraguard_pkg.getDiskMetrics(?, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
-            stmt.registerOutParameter(1, java.sql.Types.REF_CURSOR);
+            stmt.setInt(1, 12);
+            stmt.registerOutParameter(2, java.sql.Types.REF_CURSOR);
             stmt.execute();
-            try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(1)) {
+            try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(2)) {
                 if (rs.next()) {
                     result.put("diskid", rs.getDouble("diskid"));
                     result.put("total", rs.getDouble("total"));
@@ -148,9 +149,6 @@ public class MetricsDAO {
                     result.put("usable", rs.getDouble("usable"));
                     result.put("modifiedBy", rs.getDouble("modifiedBy"));
                     result.put("modifiedDate", rs.getDouble("modifiedDate"));
-                    log.info("Fetched total of {} bytes from disk", result.get("total"));
-                    log.info("Fetched free of {} bytes from disk", result.get("free"));
-                    log.info("Fetched usable of {} bytes from disk", result.get("usable"));
                 }
             }
         } catch (Exception err) {
@@ -169,9 +167,10 @@ public class MetricsDAO {
         String sql = "{call infraguard_pkg.getMemoryMetrics(12, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
-            stmt.registerOutParameter(1, java.sql.Types.REF_CURSOR);
+            stmt.setInt(1, 12);
+            stmt.registerOutParameter(2, java.sql.Types.REF_CURSOR);
             stmt.execute();
-            try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(1)) {
+            try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(2)) {
                 if (rs.next()) {
                     result.put("memoryid", rs.getDouble("memoryid"));
                     result.put("init", rs.getDouble("init"));
@@ -198,9 +197,10 @@ public class MetricsDAO {
         String sql = "{call infraguard_pkg.getCPUMetrics(12, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
-            stmt.registerOutParameter(1, java.sql.Types.REF_CURSOR);
+            stmt.setInt(1, 12);
+            stmt.registerOutParameter(2, java.sql.Types.REF_CURSOR);
             stmt.execute();
-            try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(1)) {
+            try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(2)) {
                 if (rs.next()) {
                     result.put("cpuid", rs.getDouble("cpuid"));
                     result.put("threadName", rs.getDouble("threadName"));
