@@ -31,6 +31,8 @@
 
 package com.aerosimo.ominet.core.model;
 
+import com.aerosimo.ominet.dao.impl.DiskUsageDTO;
+import com.aerosimo.ominet.dao.impl.MemoryUsageDTO;
 import com.aerosimo.ominet.dao.mapper.MetricsDAO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,13 +42,11 @@ import java.io.IOException;
 import java.lang.management.*;
 import java.net.*;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 
 public class PulsePoint {
 
     private static final Logger log = LogManager.getLogger(PulsePoint.class.getName());
-    private static final Instant START_TIME = Instant.now();
 
     public static boolean isAlive(String target) {
         if (target.startsWith("http://") || target.startsWith("https://")) {
@@ -130,40 +130,41 @@ public class PulsePoint {
         return "Running";
     }
 
-    public static String[] getDisk() {
-        // We ask the DAO for the most recent record (1 hour back)
-        Map<String, Object> data = MetricsDAO.getLatestDiskMetric();
-
-        if (data.isEmpty()) return new String[] {"0.00GB", "0.00GB", "0.00GB"};
-
-        return new String[] {
-                String.format("%.2fGB", (Double) data.get("total")),
-                String.format("%.2fGB", (Double) data.get("free")),
-                String.format("%.2fGB", (Double) data.get("usable"))
-        };
+    public static List<DiskUsageDTO> getDisk() {
+        List<DiskUsageDTO> diskusage = new ArrayList<>();
+        List<Map<String, Object>> dataList = MetricsDAO.getLatestDiskMetric();
+        for (Map<String, Object> data : dataList) {
+            diskusage.add(new DiskUsageDTO(
+                    String.format("%.2fGB", (Double) data.get("total")),
+                    String.format("%.2fGB", (Double) data.get("free")),
+                    String.format("%.2fGB", (Double) data.get("usable"))
+            ));
+        }
+        return diskusage;
     }
 
-    public static String[] getMemory() {
-        Map<String, Object> data = MetricsDAO.getLatestMemoryMetric();
-
-        if (data.isEmpty()) return new String[] {"0.00GB", "0.00GB", "0.00GB", "0.00GB"};
-
-        return new String[] {
-                String.format("%.2fGB", (Double) data.get("init")),
-                String.format("%.2fGB", (Double) data.get("used")),
-                String.format("%.2fGB", (Double) data.get("max")),
-                String.format("%.2fGB", (Double) data.get("committed"))
-        };
+    public static List<MemoryUsageDTO> getMemory() {
+        List<MemoryUsageDTO> memoryusage = new ArrayList<>();
+        List<Map<String, Object>> dataList = MetricsDAO.getLatestMemoryMetric();
+        for (Map<String, Object> data : dataList) {
+            memoryusage.add(new MemoryUsageDTO(
+                    String.format("%.2fGB", (Double) data.get("init")),
+                    String.format("%.2fGB", (Double) data.get("used")),
+                    String.format("%.2fGB", (Double) data.get("max")),
+                    String.format("%.2fGB", (Double) data.get("committed"))
+            ));
+        }
+        return memoryusage;
     }
 
     public static ArrayList<String> getCpu() {
         ArrayList<String> cpuList = new ArrayList<>();
-        List<Map<String, Object>> threads = Collections.singletonList(MetricsDAO.getLatestCpuMetrics());
-
-        for (Map<String, Object> thread : threads) {
-            cpuList.add((String) thread.get("threadName"));
-            cpuList.add((String) thread.get("state"));
-            cpuList.add(String.valueOf(thread.get("cpuTime")));
+        List<Map<String, Object>> threads = MetricsDAO.getLatestCpuMetrics();
+        Collections.reverse(threads);
+        for (Map<String, Object> snapshot : threads) {
+            cpuList.add((String) snapshot.getOrDefault("threadName", "N/A"));
+            cpuList.add((String) snapshot.getOrDefault("state", "N/A"));
+            cpuList.add(String.valueOf(snapshot.getOrDefault("cpuTime", "0")));
         }
         return cpuList;
     }

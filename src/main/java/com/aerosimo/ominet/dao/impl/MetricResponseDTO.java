@@ -34,32 +34,32 @@ package com.aerosimo.ominet.dao.impl;
 import java.util.List;
 
 public class MetricResponseDTO {
-    private DiskUsageDTO disk;
-    private MemoryUsageDTO memory;
+    private List<DiskUsageDTO> disk;
+    private List<MemoryUsageDTO> memory;
     private List<CpuThreadDTO> cpu;
 
     public MetricResponseDTO() {
     }
 
-    public MetricResponseDTO(DiskUsageDTO disk, MemoryUsageDTO memory, List<CpuThreadDTO> cpu) {
+    public MetricResponseDTO(List<DiskUsageDTO> disk, List<MemoryUsageDTO> memory, List<CpuThreadDTO> cpu) {
         this.disk = disk;
         this.memory = memory;
         this.cpu = cpu;
     }
 
-    public DiskUsageDTO getDisk() {
+    public List<DiskUsageDTO> getDisk() {
         return disk;
     }
 
-    public void setDisk(DiskUsageDTO disk) {
+    public void setDisk(List<DiskUsageDTO> disk) {
         this.disk = disk;
     }
 
-    public MemoryUsageDTO getMemory() {
+    public List<MemoryUsageDTO> getMemory() {
         return memory;
     }
 
-    public void setMemory(MemoryUsageDTO memory) {
+    public void setMemory(List<MemoryUsageDTO> memory) {
         this.memory = memory;
     }
 

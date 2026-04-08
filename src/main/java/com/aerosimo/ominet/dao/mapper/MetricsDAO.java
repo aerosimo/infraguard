@@ -39,6 +39,7 @@ import org.apache.logging.log4j.Logger;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,8 +134,8 @@ public class MetricsDAO {
         }
     }
 
-    public static Map<String, Object> getLatestDiskMetric() {
-        Map<String, Object> result = new HashMap<>();
+    public static List<Map<String, Object>> getLatestDiskMetric() {
+        List<Map<String, Object>> result = new ArrayList<>();
         String sql = "{call infraguard_pkg.getDiskMetrics(?, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -142,13 +143,12 @@ public class MetricsDAO {
             stmt.registerOutParameter(2, java.sql.Types.REF_CURSOR);
             stmt.execute();
             try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(2)) {
-                if (rs.next()) {
-                    result.put("diskid", rs.getDouble("diskid"));
-                    result.put("total", rs.getDouble("total"));
-                    result.put("free", rs.getDouble("free"));
-                    result.put("usable", rs.getDouble("usable"));
-                    result.put("modifiedBy", rs.getString("modifiedBy"));
-                    result.put("modifiedDate", rs.getTimestamp("modifiedDate"));
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("total", rs.getDouble("total"));
+                    row.put("free", rs.getDouble("free"));
+                    row.put("usable", rs.getDouble("usable"));
+                    result.add(row);
                 }
             }
         } catch (Exception err) {
@@ -162,8 +162,8 @@ public class MetricsDAO {
         return result;
     }
 
-    public static Map<String, Object> getLatestMemoryMetric() {
-        Map<String, Object> result = new HashMap<>();
+    public static List<Map<String, Object>> getLatestMemoryMetric() {
+        List<Map<String, Object>> result = new ArrayList<>();
         String sql = "{call infraguard_pkg.getMemoryMetrics(?, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -171,14 +171,13 @@ public class MetricsDAO {
             stmt.registerOutParameter(2, java.sql.Types.REF_CURSOR);
             stmt.execute();
             try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(2)) {
-                if (rs.next()) {
-                    result.put("memoryid", rs.getDouble("memoryid"));
-                    result.put("init", rs.getDouble("init"));
-                    result.put("used", rs.getDouble("used"));
-                    result.put("max", rs.getDouble("max"));
-                    result.put("committed", rs.getDouble("committed"));
-                    result.put("modifiedBy", rs.getString("modifiedBy"));
-                    result.put("modifiedDate", rs.getTimestamp("modifiedDate"));
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("init", rs.getDouble("init"));
+                    row.put("used", rs.getDouble("used"));
+                    row.put("max", rs.getDouble("max"));
+                    row.put("committed", rs.getDouble("committed"));
+                    result.add(row);
                 }
             }
         } catch (Exception err) {
@@ -192,8 +191,8 @@ public class MetricsDAO {
         return result;
     }
 
-    public static Map<String, Object> getLatestCpuMetrics() {
-        Map<String, Object> result = new HashMap<>();
+    public static List<Map<String, Object>> getLatestCpuMetrics() {
+        List<Map<String, Object>> result = new ArrayList<>();
         String sql = "{call infraguard_pkg.getCPUMetrics(?, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -201,13 +200,12 @@ public class MetricsDAO {
             stmt.registerOutParameter(2, java.sql.Types.REF_CURSOR);
             stmt.execute();
             try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(2)) {
-                if (rs.next()) {
-                    result.put("cpuid", rs.getLong("cpuid"));
-                    result.put("threadName", rs.getString("threadName"));
-                    result.put("state", rs.getString("state"));
-                    result.put("cpuTime", rs.getLong("cpuTime"));
-                    result.put("modifiedBy", rs.getString("modifiedBy"));
-                    result.put("modifiedDate", rs.getTimestamp("modifiedDate"));
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("threadName", rs.getDouble("threadName"));
+                    row.put("state", rs.getDouble("state"));
+                    row.put("cpuTime", rs.getDouble("cpuTime"));
+                    result.add(row);
                 }
             }
         } catch (Exception err) {

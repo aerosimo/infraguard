@@ -82,15 +82,18 @@ public class InfraGuardREST {
     @Path("/metric")
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkUsage() {
-        String[] disk = PulsePoint.getDisk();
-        String[] memory = PulsePoint.getMemory();
-        List<String> cpuRaw = PulsePoint.getCpu();
-        DiskUsageDTO diskDTO = new DiskUsageDTO(disk[0], disk[1], disk[2]);
-        MemoryUsageDTO memoryDTO = new MemoryUsageDTO(memory[0], memory[1], memory[2], memory[3]);
+        List<DiskUsageDTO> disk = PulsePoint.getDisk();
+        List<MemoryUsageDTO> memory = PulsePoint.getMemory();
+        ArrayList<String> cpuRaw = PulsePoint.getCpu();
         List<CpuThreadDTO> cpuDTOs = new ArrayList<>();
         for (int i = 0; i < cpuRaw.size(); i += 3) {
-            cpuDTOs.add(new CpuThreadDTO(cpuRaw.get(i), cpuRaw.get(i+1), cpuRaw.get(i+2)));}
-        MetricResponseDTO metrics = new MetricResponseDTO(diskDTO, memoryDTO, cpuDTOs);
+            cpuDTOs.add(new CpuThreadDTO(
+                    cpuRaw.get(i),
+                    cpuRaw.get(i + 1),
+                    cpuRaw.get(i + 2)
+            ));
+        }
+        MetricResponseDTO metrics = new MetricResponseDTO(disk, memory, cpuDTOs);
         return Response.ok(metrics).build();
     }
 
