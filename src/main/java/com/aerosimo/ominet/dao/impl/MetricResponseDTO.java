@@ -38,9 +38,6 @@ public class MetricResponseDTO {
     private List<MemoryUsageDTO> memory;
     private List<CpuThreadDTO> cpu;
 
-    public MetricResponseDTO() {
-    }
-
     public MetricResponseDTO(List<DiskUsageDTO> disk, List<MemoryUsageDTO> memory, List<CpuThreadDTO> cpu) {
         this.disk = disk;
         this.memory = memory;
