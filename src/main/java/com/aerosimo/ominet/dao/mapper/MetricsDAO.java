@@ -64,7 +64,7 @@ public class MetricsDAO {
      * Saves Disk Metrics to Oracle via PL/SQL Package
      */
     public static void saveDiskMetrics(Map<String, String> diskData, String modifiedBy) {
-        String sql = "{call infraguard_pkg.log_disk_usage(?, ?, ?, ?)}";
+        String sql = "{call infraguard_pkg.logDiskUsage(?, ?, ?, ?)}";
 
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -87,7 +87,7 @@ public class MetricsDAO {
      * Saves Memory Metrics to Oracle via PL/SQL Package
      */
     public static void saveMemoryMetrics(Map<String, String> memData, String modifiedBy) {
-        String sql = "{call infraguard_pkg.log_memory_usage(?, ?, ?, ?, ?)}";
+        String sql = "{call infraguard_pkg.logMemoryUsage(?, ?, ?, ?, ?)}";
 
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -111,7 +111,7 @@ public class MetricsDAO {
      * Saves CPU Threads (Batch insert loop)
      */
     public static void saveCpuMetrics(List<Map<String, Object>> cpuThreads, String modifiedBy) {
-        String sql = "{call infraguard_pkg.log_cpu_usage(?, ?, ?, ?)}";
+        String sql = "{call infraguard_pkg.logCpuUsage(?, ?, ?, ?)}";
 
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
@@ -135,7 +135,7 @@ public class MetricsDAO {
 
     public static Map<String, Object> getLatestDiskMetric() {
         Map<String, Object> result = new HashMap<>();
-        String sql = "{call infraguard_pkg.get_metrics_history('DISK', 1, ?)}";
+        String sql = "{call infraguard_pkg.getDiskMetrics(12, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
             stmt.registerOutParameter(1, java.sql.Types.REF_CURSOR);
@@ -166,7 +166,7 @@ public class MetricsDAO {
 
     public static Map<String, Object> getLatestMemoryMetric() {
         Map<String, Object> result = new HashMap<>();
-        String sql = "{call infraguard_pkg.get_metrics_history('MEMORY', 1, ?)}";
+        String sql = "{call infraguard_pkg.getMemoryMetrics(12, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
             stmt.registerOutParameter(1, java.sql.Types.REF_CURSOR);
@@ -195,7 +195,7 @@ public class MetricsDAO {
 
     public static Map<String, Object> getLatestCpuMetrics() {
         Map<String, Object> result = new HashMap<>();
-        String sql = "{call infraguard_pkg.get_metrics_history('CPU', 1, ?)}";
+        String sql = "{call infraguard_pkg.getCPUMetrics(12, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
             stmt.registerOutParameter(1, java.sql.Types.REF_CURSOR);
