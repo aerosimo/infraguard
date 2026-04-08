@@ -160,7 +160,7 @@ public class PulsePoint {
     public static ArrayList<String> getCpu() {
         ArrayList<String> cpuList = new ArrayList<>();
         List<Map<String, Object>> threads = MetricsDAO.getLatestCpuMetrics();
-        //Collections.reverse(threads);
+        Collections.reverse(threads);
         log.info("CPU Rows Found: - {}", threads.size());
         for (Map<String, Object> snapshot : threads) {
             cpuList.add((String) snapshot.getOrDefault("threadName", "N/A"));

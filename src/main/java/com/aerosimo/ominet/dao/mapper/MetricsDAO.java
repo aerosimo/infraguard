@@ -203,8 +203,8 @@ public class MetricsDAO {
                 while (rs.next()) {
                     Map<String, Object> row = new HashMap<>();
                     row.put("threadName", rs.getDouble("threadName"));
-                    row.put("state", rs.getDouble("state"));
-                    row.put("cpuTime", rs.getDouble("cpuTime"));
+                    row.put("state", rs.getString("state"));
+                    row.put("cpuTime", rs.getLong("cpuTime"));
                     result.add(row);
                 }
             }
