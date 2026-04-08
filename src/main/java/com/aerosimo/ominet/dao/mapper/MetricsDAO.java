@@ -202,7 +202,7 @@ public class MetricsDAO {
             try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(2)) {
                 while (rs.next()) {
                     Map<String, Object> row = new HashMap<>();
-                    row.put("threadName", rs.getDouble("threadName"));
+                    row.put("threadName", rs.getString("threadName"));
                     row.put("state", rs.getString("state"));
                     row.put("cpuTime", rs.getLong("cpuTime"));
                     result.add(row);
