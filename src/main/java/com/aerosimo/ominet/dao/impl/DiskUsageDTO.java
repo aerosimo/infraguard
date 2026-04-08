@@ -35,14 +35,16 @@ public class DiskUsageDTO {
     private String total;
     private String free;
     private String usable;
+    private String modifiedDate;
 
     public DiskUsageDTO() {
     }
 
-    public DiskUsageDTO(String total, String free, String usable) {
+    public DiskUsageDTO(String total, String free, String usable, String modifiedDate) {
         this.total = total;
         this.free = free;
         this.usable = usable;
+        this.modifiedDate = modifiedDate;
     }
 
     public String getTotal() {
@@ -69,12 +71,21 @@ public class DiskUsageDTO {
         this.usable = usable;
     }
 
+    public String getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(String modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
     @Override
     public String toString() {
         return "DiskUsageDTO{" +
                 "total='" + total + '\'' +
                 ", free='" + free + '\'' +
                 ", usable='" + usable + '\'' +
+                ", modifiedDate='" + modifiedDate + '\'' +
                 '}';
     }
 }

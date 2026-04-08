@@ -90,7 +90,8 @@ public class InfraGuardREST {
             cpuDTOs.add(new CpuThreadDTO(
                     cpuRaw.get(i),
                     cpuRaw.get(i + 1),
-                    cpuRaw.get(i + 2)
+                    cpuRaw.get(i + 2),
+                    cpuRaw.get(i + 3)
             ));
         }
         MetricResponseDTO metrics = new MetricResponseDTO(disk, memory, cpuDTOs);
