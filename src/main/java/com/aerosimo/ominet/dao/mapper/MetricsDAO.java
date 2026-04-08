@@ -202,10 +202,10 @@ public class MetricsDAO {
             stmt.execute();
             try (java.sql.ResultSet rs = (java.sql.ResultSet) stmt.getObject(2)) {
                 if (rs.next()) {
-                    result.put("cpuid", rs.getDouble("cpuid"));
-                    result.put("threadName", rs.getDouble("threadName"));
-                    result.put("state", rs.getDouble("state"));
-                    result.put("cpuTime", rs.getDouble("cpuTime"));
+                    result.put("cpuid", rs.getLong("cpuid"));
+                    result.put("threadName", rs.getString("threadName"));
+                    result.put("state", rs.getString("state"));
+                    result.put("cpuTime", rs.getLong("cpuTime"));
                     result.put("modifiedBy", rs.getString("modifiedBy"));
                     result.put("modifiedDate", rs.getTimestamp("modifiedDate"));
                 }
