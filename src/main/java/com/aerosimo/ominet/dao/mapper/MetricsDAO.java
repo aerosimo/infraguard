@@ -147,8 +147,8 @@ public class MetricsDAO {
                     result.put("total", rs.getDouble("total"));
                     result.put("free", rs.getDouble("free"));
                     result.put("usable", rs.getDouble("usable"));
-                    result.put("modifiedBy", rs.getDouble("modifiedBy"));
-                    result.put("modifiedDate", rs.getDouble("modifiedDate"));
+                    result.put("modifiedBy", rs.getString("modifiedBy"));
+                    result.put("modifiedDate", rs.getTimestamp("modifiedDate"));
                 }
             }
         } catch (Exception err) {
@@ -164,7 +164,7 @@ public class MetricsDAO {
 
     public static Map<String, Object> getLatestMemoryMetric() {
         Map<String, Object> result = new HashMap<>();
-        String sql = "{call infraguard_pkg.getMemoryMetrics(12, ?)}";
+        String sql = "{call infraguard_pkg.getMemoryMetrics(?, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
             stmt.setInt(1, 12);
@@ -177,8 +177,8 @@ public class MetricsDAO {
                     result.put("used", rs.getDouble("used"));
                     result.put("max", rs.getDouble("max"));
                     result.put("committed", rs.getDouble("committed"));
-                    result.put("modifiedBy", rs.getDouble("modifiedBy"));
-                    result.put("modifiedDate", rs.getDouble("modifiedDate"));
+                    result.put("modifiedBy", rs.getString("modifiedBy"));
+                    result.put("modifiedDate", rs.getTimestamp("modifiedDate"));
                 }
             }
         } catch (Exception err) {
@@ -194,7 +194,7 @@ public class MetricsDAO {
 
     public static Map<String, Object> getLatestCpuMetrics() {
         Map<String, Object> result = new HashMap<>();
-        String sql = "{call infraguard_pkg.getCPUMetrics(12, ?)}";
+        String sql = "{call infraguard_pkg.getCPUMetrics(?, ?)}";
         try (Connection con = Connect.dbase();
              CallableStatement stmt = con.prepareCall(sql)) {
             stmt.setInt(1, 12);
@@ -206,8 +206,8 @@ public class MetricsDAO {
                     result.put("threadName", rs.getDouble("threadName"));
                     result.put("state", rs.getDouble("state"));
                     result.put("cpuTime", rs.getDouble("cpuTime"));
-                    result.put("modifiedBy", rs.getDouble("modifiedBy"));
-                    result.put("modifiedDate", rs.getDouble("modifiedDate"));
+                    result.put("modifiedBy", rs.getString("modifiedBy"));
+                    result.put("modifiedDate", rs.getTimestamp("modifiedDate"));
                 }
             }
         } catch (Exception err) {
