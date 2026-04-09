@@ -36,17 +36,15 @@ public class MemoryUsageDTO {
     private String used;
     private String max;
     private String committed;
-    private String modifiedDate;
 
     public MemoryUsageDTO() {
     }
 
-    public MemoryUsageDTO(String init, String used, String max, String committed, String modifiedDate) {
+    public MemoryUsageDTO(String init, String used, String max, String committed) {
         this.init = init;
         this.used = used;
         this.max = max;
         this.committed = committed;
-        this.modifiedDate = modifiedDate;
     }
 
     public String getInit() {
@@ -81,14 +79,6 @@ public class MemoryUsageDTO {
         this.committed = committed;
     }
 
-    public String getModifiedDate() {
-        return modifiedDate;
-    }
-
-    public void setModifiedDate(String modifiedDate) {
-        this.modifiedDate = modifiedDate;
-    }
-
     @Override
     public String toString() {
         return "MemoryUsageDTO{" +
@@ -96,7 +86,6 @@ public class MemoryUsageDTO {
                 ", used='" + used + '\'' +
                 ", max='" + max + '\'' +
                 ", committed='" + committed + '\'' +
-                ", modifiedDate='" + modifiedDate + '\'' +
                 '}';
     }
 }

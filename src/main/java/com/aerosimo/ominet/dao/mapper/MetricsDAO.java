@@ -148,7 +148,6 @@ public class MetricsDAO {
                     row.put("total", rs.getDouble("total"));
                     row.put("free", rs.getDouble("free"));
                     row.put("usable", rs.getDouble("usable"));
-                    row.put("modifiedDate", rs.getTimestamp("modifiedDate"));
                     result.add(row);
                 }
             }
@@ -178,7 +177,6 @@ public class MetricsDAO {
                     row.put("used", rs.getDouble("used"));
                     row.put("max", rs.getDouble("max"));
                     row.put("committed", rs.getDouble("committed"));
-                    row.put("modifiedDate", rs.getTimestamp("modifiedDate"));
                     result.add(row);
                 }
             }
@@ -207,7 +205,6 @@ public class MetricsDAO {
                     row.put("threadName", rs.getString("threadName"));
                     row.put("state", rs.getString("state"));
                     row.put("cpuTime", rs.getLong("cpuTime"));
-                    row.put("modifiedDate", rs.getTimestamp("modifiedDate"));
                     result.add(row);
                 }
             }

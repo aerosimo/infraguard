@@ -35,16 +35,14 @@ public class CpuThreadDTO {
     private String threadName;
     private String state;
     private String cpuTime;
-    private String modifiedDate;
 
     public CpuThreadDTO() {
     }
 
-    public CpuThreadDTO(String threadName, String state, String cpuTime, String modifiedDate) {
+    public CpuThreadDTO(String threadName, String state, String cpuTime) {
         this.threadName = threadName;
         this.state = state;
         this.cpuTime = cpuTime;
-        this.modifiedDate = modifiedDate;
     }
 
     public String getThreadName() {
@@ -71,21 +69,12 @@ public class CpuThreadDTO {
         this.cpuTime = cpuTime;
     }
 
-    public String getModifiedDate() {
-        return modifiedDate;
-    }
-
-    public void setModifiedDate(String modifiedDate) {
-        this.modifiedDate = modifiedDate;
-    }
-
     @Override
     public String toString() {
         return "CpuThreadDTO{" +
                 "threadName='" + threadName + '\'' +
                 ", state='" + state + '\'' +
                 ", cpuTime='" + cpuTime + '\'' +
-                ", modifiedDate='" + modifiedDate + '\'' +
                 '}';
     }
 }
