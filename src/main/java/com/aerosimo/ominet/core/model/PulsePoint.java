@@ -136,11 +136,15 @@ public class PulsePoint {
     public static List<DiskUsageDTO> getDisk() {
         List<DiskUsageDTO> diskusage = new ArrayList<>();
         List<Map<String, Object>> dataList = MetricsDAO.getLatestDiskMetric();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Map<String, Object> data : dataList) {
+            Timestamp timestamp = (Timestamp) data.get("modifiedDate");
+            String formattedDate = (timestamp != null ? dateFormat.format(timestamp) : "N/A");
             diskusage.add(new DiskUsageDTO(
                     String.format("%.2fGB", (Double) data.get("total")),
                     String.format("%.2fGB", (Double) data.get("free")),
-                    String.format("%.2fGB", (Double) data.get("usable"))
+                    String.format("%.2fGB", (Double) data.get("usable")),
+                    formattedDate
             ));
         }
         return diskusage;
@@ -161,7 +165,6 @@ public class PulsePoint {
                     formattedDate
             ));
         }
-        log.info("Memory Data in PulsePoint {}", memoryusage);
         return memoryusage;
     }
 
@@ -169,11 +172,14 @@ public class PulsePoint {
         ArrayList<String> cpuList = new ArrayList<>();
         List<Map<String, Object>> threads = MetricsDAO.getLatestCpuMetrics();
         Collections.reverse(threads);
-        log.info("CPU Rows Found: - {}", threads.size());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Map<String, Object> snapshot : threads) {
+            Timestamp timestamp = (Timestamp) snapshot.get("modifiedDate");
+            String formattedDate = (timestamp != null ? dateFormat.format(timestamp) : "N/A");
             cpuList.add((String) snapshot.getOrDefault("threadName", "N/A"));
             cpuList.add((String) snapshot.getOrDefault("state", "N/A"));
             cpuList.add(String.valueOf(snapshot.getOrDefault("cpuTime", "0")));
+            cpuList.add(formattedDate);
         }
         return cpuList;
     }

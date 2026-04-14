@@ -148,6 +148,7 @@ public class MetricsDAO {
                     row.put("total", rs.getDouble("total"));
                     row.put("free", rs.getDouble("free"));
                     row.put("usable", rs.getDouble("usable"));
+                    row.put("modifiedDate", rs.getTimestamp("modifiedDate"));
                     result.add(row);
                 }
             }
@@ -189,7 +190,6 @@ public class MetricsDAO {
                 throw new RuntimeException(e);
             }
         }
-        log.info("Memory Data in Metrics {}", result);
         return result;
     }
 
@@ -207,6 +207,7 @@ public class MetricsDAO {
                     row.put("threadName", rs.getString("threadName"));
                     row.put("state", rs.getString("state"));
                     row.put("cpuTime", rs.getLong("cpuTime"));
+                    row.put("modifiedDate", rs.getTimestamp("modifiedDate"));
                     result.add(row);
                 }
             }
