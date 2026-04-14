@@ -157,6 +157,7 @@ public class PulsePoint {
                     (Date) data.get("modifiedDate")
             ));
         }
+        log.info("Memory Data in PulsePoint {}", memoryusage);
         return memoryusage;
     }
 

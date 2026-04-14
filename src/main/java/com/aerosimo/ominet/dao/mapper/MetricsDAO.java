@@ -189,6 +189,7 @@ public class MetricsDAO {
                 throw new RuntimeException(e);
             }
         }
+        log.info("Memory Data in Metrics {}", result);
         return result;
     }
 
