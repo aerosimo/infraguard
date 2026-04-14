@@ -31,19 +31,17 @@
 
 package com.aerosimo.ominet.dao.impl;
 
-import java.sql.Date;
-
 public class MemoryUsageDTO {
     private String init;
     private String used;
     private String max;
     private String committed;
-    private Date modifiedDate;
+    private String modifiedDate;
 
     public MemoryUsageDTO() {
     }
 
-    public MemoryUsageDTO(String init, String used, String max, String committed, Date modifiedDate) {
+    public MemoryUsageDTO(String init, String used, String max, String committed, String modifiedDate) {
         this.init = init;
         this.used = used;
         this.max = max;
@@ -83,11 +81,11 @@ public class MemoryUsageDTO {
         this.committed = committed;
     }
 
-    public Date getModifiedDate() {
+    public String getModifiedDate() {
         return modifiedDate;
     }
 
-    public void setModifiedDate(Date modifiedDate) {
+    public void setModifiedDate(String modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
 

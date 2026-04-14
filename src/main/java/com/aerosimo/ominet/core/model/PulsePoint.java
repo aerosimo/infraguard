@@ -43,6 +43,7 @@ import java.lang.management.*;
 import java.net.*;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
 
@@ -148,13 +149,16 @@ public class PulsePoint {
     public static List<MemoryUsageDTO> getMemory() {
         List<MemoryUsageDTO> memoryusage = new ArrayList<>();
         List<Map<String, Object>> dataList = MetricsDAO.getLatestMemoryMetric();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Map<String, Object> data : dataList) {
+            Timestamp timestamp = (Timestamp) data.get("modifiedDate");
+            String formattedDate = (timestamp != null ? dateFormat.format(timestamp) : "N/A");
             memoryusage.add(new MemoryUsageDTO(
                     String.format("%.2fGB", (Double) data.get("init")),
                     String.format("%.2fGB", (Double) data.get("used")),
                     String.format("%.2fGB", (Double) data.get("max")),
                     String.format("%.2fGB", (Double) data.get("committed")),
-                    (Date) data.get("modifiedDate")
+                    formattedDate
             ));
         }
         log.info("Memory Data in PulsePoint {}", memoryusage);
