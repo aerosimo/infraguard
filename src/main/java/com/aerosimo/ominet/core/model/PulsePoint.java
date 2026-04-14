@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.*;
 import java.net.*;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
 
@@ -151,7 +152,8 @@ public class PulsePoint {
                     String.format("%.2fGB", (Double) data.get("init")),
                     String.format("%.2fGB", (Double) data.get("used")),
                     String.format("%.2fGB", (Double) data.get("max")),
-                    String.format("%.2fGB", (Double) data.get("committed"))
+                    String.format("%.2fGB", (Double) data.get("committed")),
+                    (Timestamp) data.get("modifiedDate")
             ));
         }
         return memoryusage;

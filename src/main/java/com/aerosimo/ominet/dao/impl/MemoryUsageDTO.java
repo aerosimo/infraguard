@@ -31,20 +31,24 @@
 
 package com.aerosimo.ominet.dao.impl;
 
+import java.sql.Timestamp;
+
 public class MemoryUsageDTO {
     private String init;
     private String used;
     private String max;
     private String committed;
+    private Timestamp modifiedDate;
 
     public MemoryUsageDTO() {
     }
 
-    public MemoryUsageDTO(String init, String used, String max, String committed) {
+    public MemoryUsageDTO(String init, String used, String max, String committed, Timestamp modifiedDate) {
         this.init = init;
         this.used = used;
         this.max = max;
         this.committed = committed;
+        this.modifiedDate = modifiedDate;
     }
 
     public String getInit() {
@@ -79,6 +83,14 @@ public class MemoryUsageDTO {
         this.committed = committed;
     }
 
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
     @Override
     public String toString() {
         return "MemoryUsageDTO{" +
@@ -86,6 +98,7 @@ public class MemoryUsageDTO {
                 ", used='" + used + '\'' +
                 ", max='" + max + '\'' +
                 ", committed='" + committed + '\'' +
+                ", modifiedDate=" + modifiedDate +
                 '}';
     }
 }
