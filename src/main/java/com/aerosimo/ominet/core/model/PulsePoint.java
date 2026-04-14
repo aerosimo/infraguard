@@ -181,6 +181,7 @@ public class PulsePoint {
             cpuList.add(String.valueOf(snapshot.getOrDefault("cpuTime", "0")));
             cpuList.add(formattedDate);
         }
+        log.info("CPU result in PulsePoint: " + cpuList);
         return cpuList;
     }
 

@@ -219,6 +219,7 @@ public class MetricsDAO {
                 throw new RuntimeException(e);
             }
         }
+        log.info("CPU result in Metrics DAO: " + result);
         return result;
     }
 }
