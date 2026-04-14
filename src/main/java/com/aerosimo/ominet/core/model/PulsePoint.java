@@ -171,7 +171,6 @@ public class PulsePoint {
     public static ArrayList<String> getCpu() {
         ArrayList<String> cpuList = new ArrayList<>();
         List<Map<String, Object>> threads = MetricsDAO.getLatestCpuMetrics();
-        Collections.reverse(threads);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Map<String, Object> snapshot : threads) {
             Timestamp timestamp = (Timestamp) snapshot.get("modifiedDate");
@@ -181,7 +180,6 @@ public class PulsePoint {
             cpuList.add(String.valueOf(snapshot.getOrDefault("cpuTime", "0")));
             cpuList.add(formattedDate);
         }
-        log.info("CPU result in PulsePoint: " + cpuList);
         return cpuList;
     }
 
