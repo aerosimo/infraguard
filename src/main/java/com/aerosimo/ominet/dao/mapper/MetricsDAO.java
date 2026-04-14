@@ -177,7 +177,7 @@ public class MetricsDAO {
                     row.put("used", rs.getDouble("used"));
                     row.put("max", rs.getDouble("max"));
                     row.put("committed", rs.getDouble("committed"));
-                    row.put("modifiedDate", rs.getTimestamp("modifiedDate"));
+                    row.put("modifiedDate", rs.getDate("modifiedDate"));
                     result.add(row);
                 }
             }
