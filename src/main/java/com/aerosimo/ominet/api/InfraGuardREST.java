@@ -86,7 +86,7 @@ public class InfraGuardREST {
         List<MemoryUsageDTO> memory = PulsePoint.getMemory();
         ArrayList<String> cpuRaw = PulsePoint.getCpu();
         List<CpuThreadDTO> cpuDTOs = new ArrayList<>();
-        for (int i = 0; i < cpuRaw.size(); i += 3) {
+        for (int i = 0; i < cpuRaw.size(); i += 4) {
             cpuDTOs.add(new CpuThreadDTO(
                     cpuRaw.get(i),
                     cpuRaw.get(i + 1),
