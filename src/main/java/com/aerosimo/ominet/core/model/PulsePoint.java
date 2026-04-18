@@ -31,6 +31,7 @@
 
 package com.aerosimo.ominet.core.model;
 
+import com.aerosimo.ominet.dao.impl.APIResponseDTO;
 import com.aerosimo.ominet.dao.impl.DiskUsageDTO;
 import com.aerosimo.ominet.dao.impl.MemoryUsageDTO;
 import com.aerosimo.ominet.dao.mapper.MetricsDAO;
@@ -41,7 +42,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.*;
 import java.net.*;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -218,5 +218,13 @@ public class PulsePoint {
             }
         }
         MetricsDAO.saveCpuMetrics(cpuThreads, audit);
+    }
+
+    public static APIResponseDTO Purge() {
+        String result;
+        String response;
+        result = MetricsDAO.purge();
+        response = result.contains("error") ? "error" : "success";
+        return new APIResponseDTO(response, result);
     }
 }

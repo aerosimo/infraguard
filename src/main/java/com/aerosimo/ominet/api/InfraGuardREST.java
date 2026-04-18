@@ -126,4 +126,17 @@ public class InfraGuardREST {
                     .build();
         }
     }
+
+    @GET
+    @Path("/purge")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response cleanup() {
+        APIResponseDTO response = PulsePoint.Purge();
+        if ("internal server error".equalsIgnoreCase(response.getMessage())) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(response)
+                    .build();
+        }
+        return Response.ok(response).build();
+    }
 }

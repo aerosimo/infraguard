@@ -33,6 +33,7 @@ package com.aerosimo.ominet.dao.mapper;
 
 import com.aerosimo.ominet.core.config.Connect;
 import com.aerosimo.ominet.core.model.Spectre;
+import oracle.jdbc.OracleTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -220,5 +221,27 @@ public class MetricsDAO {
             }
         }
         return result;
+    }
+
+    public static String purge() {
+        log.info("Preparing to clean up old metrics data");
+        String response;
+        String sql = "{call infraguard_pkg.purgeOldMetrics(?)}";
+        try (Connection con = Connect.dbase();
+             CallableStatement stmt = con.prepareCall(sql)) {
+            stmt.registerOutParameter(1, OracleTypes.VARCHAR);
+            stmt.execute();
+            response = stmt.getString(1);
+            log.info("Successfully clean up old metrics data with following response: {}", response);
+        } catch (SQLException err) {
+            log.error("Error in infraguard_pkg (PURGE OLD METRICS)", err);
+            try {
+                Spectre.recordError("TE-20001", "Error in infraguard_pkg (PURGE OLD METRICS): " + err.getMessage(), MetricsDAO.class.getName());
+                response = "internal server error";
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return response;
     }
 }
