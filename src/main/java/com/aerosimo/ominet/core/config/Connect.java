@@ -34,6 +34,7 @@ package com.aerosimo.ominet.core.config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -47,12 +48,6 @@ public class Connect {
 
     private static final Logger log = LogManager.getLogger(Connect.class);
 
-    /**
-     * Returns a connection via JDBC Data Sources from JNDI ("jdbc/hats").
-     * Each call does a fresh lookup to avoid stale references.
-     *
-     * @return Java SQL connection or null if lookup fails
-     */
     public static Connection dbase() {
         log.debug("Fetching a new connection from Oracle DataSource");
         Connection con = null;
@@ -67,4 +62,50 @@ public class Connect {
         }
         return con;
     }
+
+    public static String tomcatURL() {
+        log.info("Looking up tomcat url");
+        try {
+            Context initCtx = new InitialContext();
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            return (String) envCtx.lookup("url/tomcatURL");
+        } catch (NamingException err) {
+            log.error("JNDI lookup for tomcat url failed", err);
+            return null;
+        }
+    }
+
+    public static String jenkinsURL() {
+        log.info("Looking up jenkins url");
+        try {
+            Context envCtx = (Context) new InitialContext().lookup("java:comp/env");
+            return (String) envCtx.lookup("url/jenkinsURL");
+        } catch (NamingException err) {
+            log.error("JNDI lookup for Jenkins url failed", err);
+            return null;
+        }
+    }
+
+    public static String linuxURL() {
+        log.info("Looking up linux url");
+        try {
+            Context envCtx = (Context) new InitialContext().lookup("java:comp/env");
+            return (String) envCtx.lookup("url/linuxURL");
+        } catch (NamingException err) {
+            log.error("JNDI lookup for Linux url failed", err);
+            return null;
+        }
+    }
+
+    public static String payaraURL() {
+        log.info("Looking up payara url");
+        try {
+            Context envCtx = (Context) new InitialContext().lookup("java:comp/env");
+            return (String) envCtx.lookup("url/payaraURL");
+        } catch (NamingException err) {
+            log.error("JNDI lookup for Payara url failed", err);
+            return null;
+        }
+    }
+
 }

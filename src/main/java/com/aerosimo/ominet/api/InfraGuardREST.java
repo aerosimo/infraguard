@@ -31,6 +31,7 @@
 
 package com.aerosimo.ominet.api;
 
+import com.aerosimo.ominet.core.config.Connect;
 import com.aerosimo.ominet.core.model.PulsePoint;
 import com.aerosimo.ominet.core.model.Spectre;
 import com.aerosimo.ominet.dao.impl.*;
@@ -57,10 +58,10 @@ public class InfraGuardREST {
     @Path("/pulse")
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkPulse() {
-        boolean jenkinsAlive = PulsePoint.isAlive("ominet.aerosimo.com:8443");
-        boolean tomeeAlive   = PulsePoint.isAlive("https://ominet.aerosimo.com:9443");
-        boolean linuxAlive   = PulsePoint.isAlive("ominet.aerosimo.com:9090");
-        boolean oracleAlive  = true;
+        boolean jenkinsAlive = PulsePoint.isAlive(Connect.jenkinsURL());
+        boolean tomeeAlive   = PulsePoint.isAlive(Connect.tomcatURL());
+        boolean linuxAlive   = PulsePoint.isAlive(Connect.linuxURL());
+        boolean oracleAlive  = PulsePoint.isAlive(Connect.payaraURL());
         return Response.ok(
                 new PingServerResponseDTO(jenkinsAlive, oracleAlive, linuxAlive, tomeeAlive)
         ).build();
