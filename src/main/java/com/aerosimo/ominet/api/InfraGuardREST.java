@@ -58,12 +58,12 @@ public class InfraGuardREST {
     @Path("/pulse")
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkPulse() {
-        boolean jenkinsAlive = PulsePoint.isAlive(Connect.jenkinsURL());
-        boolean tomeeAlive   = PulsePoint.isAlive(Connect.tomcatURL());
-        boolean linuxAlive   = PulsePoint.isAlive(Connect.linuxURL());
-        boolean oracleAlive  = PulsePoint.isAlive(Connect.payaraURL());
+        boolean jenkinsAlive = PulsePoint.isAlive(Connect.jenkinsURL().substring(8));
+        boolean tomcatAlive   = PulsePoint.isAlive(Connect.tomcatURL().substring(8));
+        boolean linuxAlive   = PulsePoint.isAlive(Connect.linuxURL().substring(8));
+        boolean payaraAlive  = PulsePoint.isAlive(Connect.payaraURL().substring(8));
         return Response.ok(
-                new PingServerResponseDTO(jenkinsAlive, oracleAlive, linuxAlive, tomeeAlive)
+                new PingServerResponseDTO(jenkinsAlive, payaraAlive , linuxAlive, tomcatAlive)
         ).build();
     }
 
